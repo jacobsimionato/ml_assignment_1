@@ -1,20 +1,11 @@
-function [w, b, E] = js_train(label, features, C)
+function [w, b, optval] = js_train(label, features, C)
     y = label;
     x = features;
     
     % n is the number of points, and l is the number of features
     [n, l] = size(features);
-    n
-    l
         
     cvx_begin
-%         variable w(l)
-%         variable E(n)
-%         variable b(n)
-%         E >= 0;
-%         diag(y) * (x * w + b) -1 + E >= 0;
-%         minimize(0.5 * w' * w + C * sum(E))
-
         
     variables w(l) E(n) b
     
@@ -25,4 +16,4 @@ function [w, b, E] = js_train(label, features, C)
 
     cvx_end
         
-    
+    optval = cvx_optval

@@ -1,12 +1,12 @@
-function [w, b, E] = js_train_dual(label, features, C)
+function [w, b, optval] = js_train_dual(label, features, C)
     y = label;
     x = features;
     
     % n is the number of points, and l is the number of features
-    [n, l] = size(features);
+    [n, l] = size(x);
     
     % Used to determine the set of support vectors S from alpha
-    zeroThresh = 0.0001;
+    zeroThresh = 0;
 
     H = diag(y) * x * x' * diag(y);
 
@@ -17,16 +17,22 @@ function [w, b, E] = js_train_dual(label, features, C)
         A <= C
         sum(y .* A) == 0;
 
-        maximize(sum(A) -  0.5 * A' * H * A);
+        maximize(sum(A) -  0.5 .* A' * H * A);
     cvx_end;
     
-    
+    % Calculate w
     w = ((A .* y)' * x)';
     
-    % Indicates the set of support vectors
-    S = A > 0;
+    % Contains 1 for indices that are a support vector, and 0 for ones that
+    % aren't
+    S = A > zeroThresh;
     
-    % 
+    % Calculate b
     b = sum((y .* S - sum(x * (diag(S .* A .* y) * x)', 2))) / sum(S);
     
-    E = -1;
+    % Calculate epsilon
+    %epsilon = (y .* (x * w + b) - ones(l)') .* S;
+    
+    %optval_dual = (0.5 * w'*w + C * sum(epsilon))
+    
+    optval = cvx_optval
